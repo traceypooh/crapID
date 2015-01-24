@@ -6,6 +6,7 @@ Using <a href="http://en.wikipedia.org/wiki/CMU_Sphinx#PocketSphinx">(Pocket)Sph
 
 # crapID
 Using standard ubuntu (unix) OS package "<a href="http://manpages.ubuntu.com/manpages/man1/simhash.1.html">simhash</a>", we take each Craptioned piece and hash the text to a ~288 byte hash file.  We call this "crapID".  We can use the same "simhash" program to compare two crapIDs and compute similarity (values [0..1] for similarity).
+I've modified the main C file a bit to make it 1000x faster for final matching.  (will make separate repo for that).
 
 
 # Experiment inputs:
@@ -14,6 +15,7 @@ A group of volunteers found TV political ADs in the Philadelphia, PA region of U
 # Experiment goal:
 See if we can use the "crapID" of the ADs to search an entire day or week of shows to see if we can find *other* repeated ADs previously not found!
 
+# Details
 
 assuming avg news/nonnews show is ~2880 secs
 Goal for EOY 2014:
