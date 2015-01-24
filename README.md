@@ -2,7 +2,7 @@
 Experiments in TV speech-to-text ("craptioning") and simhash-ing text to "crapID" for matching TV clips!
 
 # Craptions:
-Using <a href="http://en.wikipedia.org/wiki/CMU_Sphinx#PocketSphinx">(Pocket)Sphinx</a> very basic speech-to-text package, we make poor quality captions, AKA Craptions, from archive.org TV show audio.
+Using <a href="http://en.wikipedia.org/wiki/CMU_Sphinx#PocketSphinx">(Pocket)Sphinx</a> very basic speech-to-text package, we make poor quality captions, AKA Craptions, from <a href="https://archive.org/tv">archive.org TV<a/> show audio.
 
 # crapID
 Using standard ubuntu (unix) OS package "<a href="http://manpages.ubuntu.com/manpages/man1/simhash.1.html">simhash</a>", we take each Craptioned piece and hash the text to a ~288 byte hash file.  We call this "crapID".  We can use the same "simhash" program to compare two crapIDs and compute similarity (values [0..1] for similarity).
