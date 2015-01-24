@@ -9,7 +9,7 @@ For the week before 2014 election, all TV shows (*including* non-news).
   - match all 8,075 manually found political PHL ads to above, using simhash (dec2014)
   - match all manually found political PHL ads to above, using simhash (dec2014)
 
-# MozFest 2014 experiment:
+# <a href="http://mozfestartoftheweb.tumblr.com/">MozFest 2014</a> experiment:
   - N = 31 news shows
   - 10 second chunks
   - made 18K files (.txt + .hash)  (288 * N)
