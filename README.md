@@ -1,5 +1,19 @@
-# crapID
+# About this crapID repo:
 Experiments in TV speech-to-text ("craptioning") and simhash-ing text to "crapID" for matching TV clips!
+
+# Craptions:
+Using <a href="http://en.wikipedia.org/wiki/CMU_Sphinx#PocketSphinx">(Pocket)Sphinx</a> very basic speech-to-text package, we make poor quality captions, AKA Craptions, from archive.org TV show audio.
+
+# crapID
+Using standard ubuntu (unix) OS package "simhash", we take each Craptioned piece and hash the text to a ~288 byte hash file.  We call this "crapID".  We can use the same "simhash" program to compare two crapIDs and compute similarity (values [0..1] for similarity).
+
+
+# Experiment inputs:
+A group of volunteers found TV political ADs in the Philadelphia, PA region of US TV recordings and identified just over 8000 commercials.
+
+# Experiment goal:
+See if we can use the "crapID" of the ADs to search an entire day or week of shows to see if we can find *other* repeated ADs previously not found!
+
 
 assuming avg news/nonnews show is ~2880 secs
 Goal for EOY 2014:
