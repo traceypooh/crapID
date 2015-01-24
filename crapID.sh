@@ -34,7 +34,7 @@
 DIR=/var/tmp/tv;
 VIDEO_SPLIT_LENGTH=60; # cut up each full show into pieces of this many seconds
 NPROC=12;
-
+LOCAL_GIT_REPO=/home/tracey/crapID;   # local clone of https://github.com/traceypooh/crapID
 
 source ~tracey/.aliases;
 set -x;
@@ -152,6 +152,8 @@ process(){
   cd $DIR;
 
   # split total number of items we will process into NPROC files
+  ln -s $LOCAL_GIT_REPO/ids ids;
+  cat ids | rand >| ids.rand;
   split -n l/$NPROC  ids.rand;
 
 
@@ -196,6 +198,8 @@ EOF
 
 
 
+mkdir -p $DIR;
+mkdir -p $DIR/ADS;
 process "speech-to-text-haystack";
 process "text-to-hash";
 cd $DIR;
