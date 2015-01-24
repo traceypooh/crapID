@@ -2,10 +2,13 @@
 
 # assuming avg news/nonnews show is ~2880 secs
 
-# goal by 12/31:
-# week before election, all shows (incl nonnews).
-# compute crapIDs for every 10 seconds of show
-
+# Goal for EOY 2014:
+#
+# For the week before 2014 election, all TV shows (*including* non-news).
+#   - compute crapIDs for every 10 seconds of show (dec2014)
+#   - compute crapIDs for every 60 seconds of show (jan2015)
+#   - match all 8,075 manually found political PHL ads to above, using simhash (dec2014)
+#   - match all manually found political PHL ads to above, using simhash (dec2014)
 
 
 
@@ -24,10 +27,13 @@
 # ==> ~4.5G of txt/hash files
 # ==> ~34 days to run!!
 #
-# ==> so use 4x threads to get ~8.5 day run
+# ==> so use  4x threads to get ~8.5 day run (dec2014)
+# ==> so use 12x threads to get < 3  day run (jan2015)
 
 
 DIR=/var/tmp/tv;
+VIDEO_SPLIT_LENGTH=60; # cut up each full show into pieces of this many seconds
+NPROC=12;
 
 
 source ~tracey/.aliases;
@@ -39,20 +45,24 @@ sphinx(){
   LD_LIBRARY_PATH=/home/petabox/ptvn/trunk/library/usr/local/lib/  /home/petabox/ptvn/trunk/video_segmenter/speech_recognizer/pocketsphinx-example/pocketsphinx_example "$@";
 }
 
-sphinx-in-10s() {
+sphinx-in-chunks() {
   FI=${1:?"Usage: <input file, should be .wav>"};
 
+  # compute the number of seconds for the overall show (by analyzing the audio packets)
   nsec=$(apackets "$FI" 2>/dev/null | egrep -o 'duration_time=[^ ]+'|cut -f2 -d= | perl -ne '$|=1; chop; $n+=$_; print (int($n*10)/10)."\n" if (eof());'|cut -f1 -d.);
   ID=$(echo "$FI" |perl -pe 's/\.wav$//');   
   echo "[$ID] [$nsec]";
-  for i in $(seq -w 0 10 $nsec); do  
-    ffmpeg -v 0 -y -ss $i  -i $FI -t 10  -vn -c:a copy  tmp.wav;
+  # split the WAV into VIDEO_SPLIT_LENGTH chunks
+  for i in $(seq -w 0 $VIDEO_SPLIT_LENGTH $nsec); do
+    # make 1 chunk
+    ffmpeg -v 0 -y -ss $i  -i $FI -t $VIDEO_SPLIT_LENGTH  -vn -c:a copy  tmp.wav;
+    # now speech-to-text the chunk
     sphinx -i tmp.wav -o $ID-$i.txt    >| $FI.sphinx.log   2>&1;
   done
 }
 
 
-speech-to-text(){
+speech-to-text-haystack(){
   fi="$1";
   stat $fi;
   lc $fi;
@@ -76,8 +86,8 @@ speech-to-text(){
     ffmpeg -v 0 -i $SRC  -ac 1  $id.wav;
     rm -f $SRC;
 
-    # now cut the WAV in to 10-second chunks, and speech-to-text each
-    sphinx-in-10s  $id.wav;
+    # now cut the WAV in to VIDEO_SPLIT_LENGTH second chunks, and speech-to-text each
+    sphinx-in-chunks  $id.wav;
     rm -f $id.wav;
   done
   
@@ -92,8 +102,8 @@ speech-to-text-ads(){
     # take mp4 and convert it to single WAV file
     ffmpeg -v 0 -i $SRC  -ac 1  $SRC.wav;
 
-    # now cut the WAV in to 10-second chunks, and speech-to-text each
-    sphinx-in-10s  $SRC.wav;
+    # now cut the WAV in to VIDEO_SPLIT_LENGTH second chunks, and speech-to-text each
+    sphinx-in-chunks  $SRC.wav;
     rm -f $SRC.wav;
   done
   echo DONE;
@@ -141,14 +151,21 @@ process(){
   fn="$1";
   cd $DIR;
 
-  $fn xaa 2>&1 | tee $fn-xaa.log &
-  $fn xab 2>&1 | tee $fn-xab.log &
-  $fn xac 2>&1 | tee $fn-xac.log &
-  $fn xad 2>&1 | tee $fn-xad.log &
-  wait;
-  wait;
-  wait;
-  wait;
+  # split total number of items we will process into NPROC files
+  split -n l/$NPROC  ids.rand;
+
+
+  # process each of the NPROC files as full unix process, with its own logfile
+  for ids in x??; do 
+    $fn $ids 2>&1 | tee $fn-$ids.log &
+  done
+
+  # now wait for all the processing to finish!
+  for ids in x??; do 
+    wait;
+  done
+
+  # move along, nothing to see here!
   echo ALL KIDS DONE!
 }
 
@@ -179,13 +196,14 @@ EOF
 
 
 
-#process "speech-to-text";
-#speech-to-text-ads;
-
+process "speech-to-text-haystack";
 process "text-to-hash";
-
-cd $DIR/ADS;  textfiles-to-hash;
-
 cd $DIR;
 find . -name '*.hash' |fgrep -v /ADS/ |sort -u -o HASHES;
-match;
+
+
+# speech-to-text-ads;
+# process "text-to-hash";
+
+# cd $DIR/ADS;  textfiles-to-hash;
+# match;
