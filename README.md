@@ -16,7 +16,7 @@ For the week before 2014 election, all TV shows (*including* non-news).
   - 15 hrs to run
   - ~82MB for the txt/hash files
 
-# pre-election week:
+# extended experiment -- full week before (Nov) 2014 US elections:
   - N = 1732 news and nonnews shows
   - 55x MORE SHOWS
   - (288 * N) => 288 * 1732 => ~500k (.txt) + ~500k (.hash) files
