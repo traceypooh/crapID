@@ -8,13 +8,15 @@ For the week before 2014 election, all TV shows (*including* non-news).
   - compute crapIDs for every 60 seconds of show (jan2015)
   - match all 8,075 manually found political PHL ads to above, using simhash (dec2014)
   - match all manually found political PHL ads to above, using simhash (dec2014)
------moz experiment:
+
+# MozFest 2014 experiment:
 N = 31 news shows
 10 second chunks
 made 18K files (.txt + .hash)  (288 * N)
 15 hrs to run
 ~82M for the txt/hash files
------pre-election week:
+
+# pre-election week:
 N = 1732 news and nonnews shows
 55x MORE SHOWS
 (288 * N) => 288 * 1732 => ~500k (.txt) + ~500k (.hash) files
