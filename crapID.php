@@ -9,16 +9,21 @@ $ao = Paths::serverSF(0);
 
 
 $matfi = glob("*.matches");
-echo "<h3>Picking 100 ADs at random from ".count($matfi)." matched ADs</h3>";
-
-shuffle($matfi);
-$matfi = array_slice($matfi,0,100);
+if (count($matfi) > 100){
+  echo "<h3>Picking 100 ADs at random from ".count($matfi)." matched ADs</h3>";
+  shuffle($matfi);
+  $matfi = array_slice($matfi,0,100);
+}
+else{
+  sort($matfi);
+  echo "<h3>".count($matfi)." matched ADs</h3>";
+}
 
 echo '<table class="tablesorter  table table-striped table-condensed table-hovertable"><tbody>';
 echo '
 <tr>
-  <th>AD (10 seconds in, length 10 seconds)</th>
-  <th>craptioned text the AD</th>
+  <th>AD</th>
+  <th>craptioned text of the AD</th>
   <th>best 10 matches (score, clip)</th>
 </tr>
 ';
