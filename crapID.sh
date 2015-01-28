@@ -97,8 +97,18 @@ speech-to-text-haystack(){
 
 speech-to-text-ads(){
   cd $DIR/ADS/;
-  for SRC in $(cat ADS); do
 
+  fgrep _20  $LOCAL_GIT_REPO/IA_Philly_Media_Watch_IDENTIFIED_ADS_v1.2.csv |cut -f1-2 -d, |phpR 'list($uni,$url)=explode(",",$argn,2); if (!isset($map[$uni])) $map[$uni]=$url;' -E 'echo join("\n",array_values($map));' |cut -f5- -d/ |perl -pe 's=#start/=,=; s=/end/=,=' |sort -u -o ADS;
+  
+  for SRC in $(cat ADS); do
+    if [ ! -e $SRC ]; then
+      id=$(echo $SRC|cut -f1 -d,);
+      start=$(echo $SRC|cut -f2 -d,);
+      end=$(echo $SRC|cut -f3 -d,);
+      wget -O $SRC  "http://archive.org/download/$id/$id.mp4?start=$start&end=$end&exact=1";
+    fi
+
+    
     # take mp4 and convert it to single WAV file
     ffmpeg -v 0 -i $SRC  -ac 1  $SRC.wav;
 
@@ -179,7 +189,7 @@ function match(){
   php -- "$@" <<\
 "EOF"
 <? @spl_autoload(ia);
-    $ads=glob("ADS/*-10.txt.hash");
+    $ads=glob("ADS/*.txt.hash");
     error_log("MATCHING AGAINST ADS, count: ".count($ads));
     
     $hashes = glob("*_*/*.hash");
@@ -206,8 +216,10 @@ cd $DIR;
 find . -name '*.hash' |fgrep -v /ADS/ |sort -u -o HASHES;
 
 
-# speech-to-text-ads;
-# process "text-to-hash";
+speech-to-text-ads;
+process "text-to-hash";
 
-# cd $DIR/ADS;  textfiles-to-hash;
-# match;
+
+cd $DIR/ADS;
+textfiles-to-hash;
+match;
