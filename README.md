@@ -53,4 +53,10 @@ For the week before 2014 election, all TV shows (*including* non-news).
 # RESULTS:
   - due to nature of "simhash", found all .txt "haystack" files with less than 50 words and removed them from consideration (all AD needles were 50+ words).  this helped avoid false positives.
   - reran matching
-  
+  - matching appears a bit spotty, but there are cases where it works great.
+  - since we use "simhash" now to "de-dupe" our search results already at https://archive.org/tv (comparing search results to themselves, where we know all results already have usable captioning), we expect using existing captioning for either AD/needle or haystack will greatly improve results.  Further, where both comparators have usable captioning, we are confident the use of simhash to find duplicates already works very well in practice (basing that on the inverse in use now to dedupe).
+  - Further, if we use a better "speech to text" system, we are certain to get even better results for uncaptioned pieces of TV clips.
+  - This took about 1 day to think about, 1 day to plan/sort out how to use sphinx and the pieces, 1 day to prototype at MozFest, 1 day to extend to entire week before the 2014 election, 1 day to improve "simhash" to greatly speed up its capabilities.  So about 5 days over a few months.
+  - We believe other people/teams could replicate these experiments quite easily (the main shell script is in this repo and is quite simple!)
+  - We believe other approaches to "craptioning" or matching could be used/tried as well, for example audio waveform signatures or "fingerprinting" and an alternate comparator.
+  - Given all the above, we have found this experimenting QUITE encouraging!
