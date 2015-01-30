@@ -48,3 +48,9 @@ For the week before 2014 election, all TV shows (*including* non-news).
   - use 12x threads to get ~3 days to process haystack
   - use entire AD as needle (typically ~60 seconds)
   - match ~100,000 haystack files  against  ~73 canonical political ads (7.3M matches)
+
+
+# RESULTS:
+  - due to nature of "simhash", found all .txt "haystack" files with less than 50 words and removed them from consideration (all AD needles were 50+ words).  this helped avoid false positives.
+  - reran matching
+  
