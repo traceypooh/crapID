@@ -22,9 +22,8 @@ else{
 echo '<table class="tablesorter  table table-striped table-condensed table-hovertable"><tbody>';
 echo '
 <tr>
-  <th>AD</th>
-  <th>craptioned text of the AD</th>
-  <th>best 10 matches (score, clip)</th>
+  <th>AD or match</th>
+  <th>craptioned text of the AD or match</th>
 </tr>
 ';
 
@@ -37,22 +36,32 @@ foreach ($matfi as $fi){
   $start += $seek;
   $end   += $end;
 
-  echo "<tr><td><a href=\"//$ao/details/$id#start/$start/end/$end\">$id#start/$start/end/$end</a></td><td>";
+  $src = "<a href=\"//$ao/details/$id#start/$start/end/$end\">$id#start/$start/end/$end</a>";
+  echo "<tr><td>$src</td><td>";
   
   $txt = preg_replace('/\.hash\.matches$/','',$fi);
   //echo file_get_contents($txt);
   echo `cat $txt |cut -f3- |perl -pe 's/\(\d+\)\$//'  |egrep -v '^<s|sil|/s>\$'`;
+  echo "</td></tr>";
 
-  $best = '';
+
+  $n=0;
   foreach (Util::cmd("cat $fi |head -10","ARRAY","CONTINUE") as $line){
+    $n++;
     if (!preg_match('=^(\S+)\s+\./[^/]+/([^/]+)\-(\d+)\.txt\.hash$=', $line, $mat))
       continue;
+    list(,$fi2)=explode("\t",$line);
     list(,$score,$id2,$start2)=$mat;
     $start2=ltrim($start2,"0");
-    $best .= "$score <a href=\"//$ao/details/$id2#start/$start2/end/".($start2+30)."\">$id2</a>\n";
+    echo "<tr><td>match #$n.  score: $score<br/> <a href=\"//$ao/details/$id2#start/$start2/end/".($start2+30)."\">$id2</a><br/>(matching to: $src)</td>";
+
+    $txt2 = "../".preg_replace('/\.hash$/','',$fi2);
+    //echo file_get_contents($txt2);
+    $best = `cat $txt2 |cut -f3- |perl -pe 's/\(\d+\)\$//'  |egrep -v '^<s|sil|/s>\$'`;
+    //$best .= $txt2;
+    echo "<td>$best</td></tr>";
   }
   
-  echo "</td><td><pre>$best</pre></td></tr>";
 }
 
 echo "</tbody></table>";
