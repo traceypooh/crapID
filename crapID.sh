@@ -213,6 +213,9 @@ mkdir -p $DIR/ADS;
 process "speech-to-text-haystack";
 process "text-to-hash";
 cd $DIR;
+
+# throw out "haystack" files with < 50 words to avoid false positives
+for i in $(find . -name ADS -prune -o -name '*.txt'|fgrep -v /ADS); do wc -l $i; done |phpR 'list($n,$fi)=explode(" ",$argn); if (is_numeric($n) && $n<50){ unlink("$fi.hash"); error_log($argn); }';
 find . -name '*.hash' |fgrep -v /ADS/ |sort -u -o HASHES;
 
 
