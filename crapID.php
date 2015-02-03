@@ -22,8 +22,10 @@ else{
 echo '<table class="tablesorter  table table-striped table-condensed table-hovertable"><tbody>';
 echo '
 <tr>
-  <th>AD or match</th>
-  <th>craptioned text of the AD or match</th>
+  <th>AD</th>
+  <th>craptioned text of the AD</th>
+  <th>match</th>
+  <th>craptioned text of the match</th>
 </tr>
 ';
 
@@ -36,14 +38,16 @@ foreach ($matfi as $fi){
   $start += $seek;
   $end   += $end;
 
-  $src = "<a href=\"//$ao/details/$id#start/$start/end/$end\">$id#start/$start/end/$end</a>";
-  echo "<tr><td>$src</td><td>";
+  $tmp = explode("_",$id);
+  $idA = array_shift($tmp)."_".array_shift($tmp)."_".join(" ",$tmp);
+  
+  $src = "<a href=\"//$ao/details/$id#start/$start/end/$end\">$idA #start/$start/end/$end</a>";
   
   $txt = preg_replace('/\.hash\.matches$/','',$fi);
   //echo file_get_contents($txt);
-  echo `cat $txt |cut -f3- |perl -pe 's/\(\d+\)\$//'  |egrep -v '^<s|sil|/s>\$'`;
-  echo "</td></tr>";
-
+  $rowstart = ("<tr><td>$src</td><td>" .
+               `cat $txt |cut -f3- |perl -pe 's/\(\d+\)\$//'  |egrep -v '^<s|sil|/s>\$'` .
+               "</td>");
 
   $n=0;
   foreach (Util::cmd("cat $fi |head -10","ARRAY","CONTINUE") as $line){
@@ -53,7 +57,12 @@ foreach ($matfi as $fi){
     list(,$fi2)=explode("\t",$line);
     list(,$score,$id2,$start2)=$mat;
     $start2=ltrim($start2,"0");
-    echo "<tr><td>match #$n.  score: $score<br/> <a href=\"//$ao/details/$id2#start/$start2/end/".($start2+30)."\">$id2</a><br/>(matching to: $src)</td>";
+
+    $tmp = explode("_",$id2);
+    $idA = array_shift($tmp)."_".array_shift($tmp)."_".join(" ",$tmp);
+
+    $startend = "#start/$start2/end/".($start2+60);
+    echo $rowstart . "<td>match #$n.  score: $score<br/> <a href=\"//$ao/details/$id2".$startend."\">$idA $startend</a><br/></td>";
 
     $txt2 = "../".preg_replace('/\.hash$/','',$fi2);
     //echo file_get_contents($txt2);
@@ -61,7 +70,9 @@ foreach ($matfi as $fi){
     //$best .= $txt2;
     echo "<td>$best</td></tr>";
   }
-  
+
+  if (!$n)
+    echo $rowstart . "<td>-</td><td>-</td></tr>";
 }
 
 echo "</tbody></table>";
