@@ -56,6 +56,8 @@ echo '
   <th>craptioned text of the AD</th>
   <th>match</th>
   <th>craptioned text of the match</th>
+  <th>score</th>
+  <th>match&nbsp;#</th>
 </tr>
 ';
 
@@ -92,17 +94,17 @@ foreach ($matfi as $fi){
     $idA = array_shift($tmp)."_".array_shift($tmp)."_".join(" ",$tmp);
 
     $startend = "#start/$start2/end/".($start2+60);
-    echo $rowstart . "<td>match #$n.  score: $score<br/> <a href=\"//$ao/details/$id2".$startend."\">$idA $startend</a><br/></td>";
+    echo $rowstart . "<td><a href=\"//$ao/details/$id2".$startend."\">$idA $startend</a><br/></td>";
 
     $txt2 = "../".preg_replace('/\.hash$/','',$fi2);
     //echo file_get_contents($txt2);
     $best = `cat $txt2 |cut -f3- |perl -pe 's/\(\d+\)\$//'  |egrep -v '^<s|sil|/s>\$'`;
     //$best .= $txt2;
-    echo "<td>$best</td></tr>";
+    echo "<td>$best</td><td>$score</td><td>#$n</td></tr>";
   }
 
   if (!$n)
-    echo $rowstart . "<td>-</td><td>-</td></tr>";
+    echo $rowstart . "<td>-</td><td>-</td><td>-</td><td>-</td></tr>";
 }
 
 echo "</tbody></table>";
