@@ -7,6 +7,11 @@ chdir("/var/tmp/tv/ADS") || fatal("bad box");
 
 $ao = Paths::serverSF(0);
 
+$filter1=($_GET['day'] && is_numeric($_GET['day']) ? "fgrep ".intval($_GET['day']) : "cat");
+$filter2="head -" . ($_GET['n'] && is_numeric($_GET['n']) ? intval($_GET['n']) : 10);
+
+
+
 
 $matfi = glob("*.matches");
 if (count($matfi) > 100){
@@ -18,6 +23,31 @@ else{
   sort($matfi);
   echo "<h3>".count($matfi)." matched ADs</h3>";
 }
+
+
+$url1=Util::url_without('n');
+$url2=Util::url_without('day');
+?>
+show best (defaults to 10): [
+<a href="<?=$url1?>&n=1">1 match</a> |
+<a href="<?=$url1?>&n=10">10 matches</ a> |
+<a href="<?=$url1?>&n=25">25 matches</a> |
+<a href="<?=$url1?>&n=50">50 matches</a> |
+<a href="<?=$url1?>&n=100000">all matches</a>
+]
+<br/>
+show only matches found on: [
+<a href="<?=$url2?>&day=20141028">20141028</a> |
+<a href="<?=$url2?>&day=20141029">20141029</a> |
+<a href="<?=$url2?>&day=20141030">20141030</a> |
+<a href="<?=$url2?>&day=20141031">20141031</a> |
+<a href="<?=$url2?>&day=20141101">20141101</a> |
+<a href="<?=$url2?>&day=20141102">20141102</a> |
+<a href="<?=$url2?>&day=20141103">20141103</a> |
+<a href="<?=$url2?>&day=20141028">20141028</a>
+]
+<?
+
 
 echo '<table class="tablesorter  table table-striped table-condensed table-hovertable"><tbody>';
 echo '
@@ -50,7 +80,7 @@ foreach ($matfi as $fi){
                "</td>");
 
   $n=0;
-  foreach (Util::cmd("cat $fi |head -10","ARRAY","CONTINUE") as $line){
+  foreach (Util::cmd("cat $fi |$filter1 |$filter2","ARRAY","CONTINUE") as $line){
     $n++;
     if (!preg_match('=^(\S+)\s+\./[^/]+/([^/]+)\-(\d+)\.txt\.hash$=', $line, $mat))
       continue;
