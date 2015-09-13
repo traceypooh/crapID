@@ -35,6 +35,8 @@ DIR=/var/tmp/tv;
 VIDEO_SPLIT_LENGTH=60; # cut up each full show into pieces of this many seconds
 NPROC=12;
 LOCAL_GIT_REPO=/home/tracey/crapID;   # local clone of https://github.com/traceypooh/crapID
+FFMPEG=ffmpeg;
+FFMPEG=/petabox/sw/bin/ffmpeg.shared;
 
 source ~tracey/.aliases;
 set -x;
@@ -55,7 +57,7 @@ sphinx-in-chunks() {
   # split the WAV into VIDEO_SPLIT_LENGTH chunks
   for i in $(seq -w 0 $VIDEO_SPLIT_LENGTH $nsec); do
     # make 1 chunk
-    ffmpeg -v 0 -y -ss $i  -i $FI -t $VIDEO_SPLIT_LENGTH  -vn -c:a copy  tmp.wav;
+    $FFMPEG -v 0 -y -ss $i  -i $FI -t $VIDEO_SPLIT_LENGTH  -vn -c:a copy  tmp.wav;
     # now speech-to-text the chunk
     sphinx -i tmp.wav -o $ID-$i.txt    >| $FI.sphinx.log   2>&1;
   done
@@ -80,10 +82,8 @@ speech-to-text-haystack(){
     mkdir -p $id;
     cd $id;
 
-    # get entire mp4 and convert it to single WAV file
-    rsy=$(finder -r $id)/$SRC;
-    rsync  $rsy  $SRC;
-    ffmpeg -v 0 -i $SRC  -ac 1  $id.wav;
+    # find source video and convert it to single WAV file
+    $FFMPEG -v 0 -i http://archive.org/download/$id/$SRC  -ac 1  $id.wav;
     rm -f $SRC;
 
     # now cut the WAV in to VIDEO_SPLIT_LENGTH second chunks, and speech-to-text each
@@ -110,7 +110,7 @@ speech-to-text-ads(){
 
     
     # take mp4 and convert it to single WAV file
-    ffmpeg -v 0 -i $SRC  -ac 1  $SRC.wav;
+    $FFMPEG -v 0 -i $SRC  -ac 1  $SRC.wav;
 
     # now cut the WAV in to VIDEO_SPLIT_LENGTH second chunks, and speech-to-text each
     sphinx-in-chunks  $SRC.wav;
@@ -211,6 +211,8 @@ EOF
 mkdir -p $DIR;
 mkdir -p $DIR/ADS;
 process "speech-to-text-haystack";
+
+
 process "text-to-hash";
 cd $DIR;
 
